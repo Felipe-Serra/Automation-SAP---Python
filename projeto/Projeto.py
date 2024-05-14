@@ -19,8 +19,8 @@ for linha in tabela.index:
     #pg.click(x=872, y=289) #N Doc - cabeçalho
     #pg.hotkey("ctrl", "c") #Pegar coluna de N Doc
     coluna = pyperclip.paste()
-    coluna = coluna.str.counts('r')
-    print("\n^^^^^^^\n",coluna,"\n^^^^^^^^^\n")
+    coluna1 = coluna.count('021')
+    print("\n^^^^^^^\n",coluna1,"\n^^^^^^^^^\n")
 
     #Pegar valor de N Doc
     #pg.hotkey("down") 
@@ -41,7 +41,8 @@ for linha in tabela.index:
 
     print(new_tabela)
 
-    for coluna in coluna.index:
+    i=0
+    while i <= coluna1:
     # Comparando Ndoc e ref
         numDoc=float(new_tabela.loc[linha,"Nosso Número"])
         numRef=float(new_tabela.loc[linha,"Comp Doc"])
@@ -50,6 +51,15 @@ for linha in tabela.index:
             dataDoc=float(new_tabela.loc[linha,"Vencimento"])
             dataRef=float(new_tabela.loc[linha,"Comp Data"])
             if(dataRef==dataDoc):            
-                print("Dar baixa") #Rodar Script do SAP 
-            else:()
+                print("Pode Rodar")
+                permissao=1 #Permite rodar Script do SAP 
+            else:(
+                #Colocar Bloq Pag
+            )
         else:(print("não vamo"))
+        i=i+1
+
+    if(permissao==1):
+        #Rodar Script
+
+        permissao=0 #terminou de rodar script para esse doc ent zerar
