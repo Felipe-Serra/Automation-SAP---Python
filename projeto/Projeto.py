@@ -28,9 +28,7 @@ permissão=0
 tabela = pd.read_excel("Projeto de automacao SAP.xlsx", sheet_name="Organizador de planilha - Sant")
 tabela = tabela.drop(columns=["Nosso Número", "Data da Liquidação", "Pagador","Conta Cobrança", "Tipo Cobrança / Modalidade", "Responsável"])
 print(tabela)
- 
- 
- 
+
 pg.hotkey("alt", "tab")
 pg.write("FBL5N") # FBL5N - Partidas individuais de clientes / Rel CLIENTES
 pg.press("enter")
