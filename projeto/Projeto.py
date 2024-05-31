@@ -54,21 +54,20 @@ for linha in tabela.index:
     coluna = pyperclip.paste()
     coluna1 = coluna.count('\n') - 3
     print("\n^^^^^^^\n",coluna,"\n**",coluna1,"**""\n^^^^^^^^^\n")
- 
+    time.sleep(1)
+    
     i=0
     while i < coluna1:
         #Pegar valor de N Doc
-        time.sleep(1)
+        
         pegarDoc()
         pegarNDoc()
  
         texto1 = float(pyperclip.paste())
         compDoc = pd.DataFrame({"Comp Doc":[texto1]})
         new_tabela = pd.concat([tabela, compDoc], axis=1)
-        print(new_tabela)
  
         # Adicionando nova coluna para comparacao de Data
-        time.sleep(1)
         pegarNData()
        
         texto2 = pyperclip.paste()
@@ -139,8 +138,8 @@ for linha in tabela.index:
            
             linha2.to_excel(writer, sheet_name="Retorno", header=None, index=None, startrow=linha+2, startcol=1)
             writer.close()
-            print(book.close())
-            print(linha2)
+            #print(book.close())
+            #print(linha2)
  
         # Fatura com data divergencia
         if (supbloq==1 & supdata==0):
@@ -150,8 +149,8 @@ for linha in tabela.index:
            
             linha2.to_excel(writer, sheet_name="Retorno", header=None, index=None, startrow=linha+2, startcol=11)
             writer.close()
-            print(book.close())
-            print(linha2)
+            #print(book.close())
+            #print(linha2)
  
         # Fatura baixada
         if ((supbloq==1 | supbloq==0) & supdata==1):
@@ -161,13 +160,10 @@ for linha in tabela.index:
            
             linha2.to_excel(writer, sheet_name="Retorno", header=None, index=None, startrow=linha+2, startcol=22)
             writer.close()
-            print(book.close())
-            print(linha2)
+            #print(book.close())
+            #print(linha2)
     else:
         print("Excel aberto: feche Aplicativo")
-   
- 
- 
     book.close()
  
 pg.hotkey("alt", "tab")
