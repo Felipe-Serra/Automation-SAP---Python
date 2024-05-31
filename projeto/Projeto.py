@@ -1,7 +1,9 @@
 import pyautogui as pg
 import pandas as pd
+import openpyxl as op
 import time
 import pyperclip
+ 
 pg.PAUSE = 0.5
  
 def pegarDoc():
@@ -24,11 +26,12 @@ def pegarNData():
     pg.press("down", presses=(i+1)) #vai de 1 até o final da coluna1 (tamanho coluna SAP)
     pg.hotkey("ctrl", "c")
  
-permissão=0
-tabela = pd.read_excel("Projeto de automacao SAP.xlsx", sheet_name="Organizador de planilha - Sant")
+permissao=0
+supdoc, supbloq, supdata = 0
+tabela = pd.read_excel("Projeto de automacao SAP.xlsx", sheet_name="DZ - Juros")
 tabela = tabela.drop(columns=["Nosso Número", "Data da Liquidação", "Pagador","Conta Cobrança", "Tipo Cobrança / Modalidade", "Responsável"])
 print(tabela)
-
+ 
 pg.hotkey("alt", "tab")
 pg.write("FBL5N") # FBL5N - Partidas individuais de clientes / Rel CLIENTES
 pg.press("enter")
@@ -48,7 +51,6 @@ for linha in tabela.index:
     coluna1=0
     coluna = pyperclip.paste()
     coluna1 = coluna.count('\n') - 3
-    #coluna = coluna.str.counts('r')
     print("\n^^^^^^^\n",coluna,"\n**",coluna1,"**""\n^^^^^^^^^\n")
  
     i=0
@@ -59,7 +61,6 @@ for linha in tabela.index:
         pegarNDoc()
  
         texto1 = float(pyperclip.paste())
-        print(pyperclip.paste())
         compDoc = pd.DataFrame({"Comp Doc":[texto1]})
         new_tabela = pd.concat([tabela, compDoc], axis=1)
         print(new_tabela)
@@ -83,20 +84,58 @@ for linha in tabela.index:
             dataDoc=new_tabela.loc[linha,"Vencimento"]
             dataRef=new_tabela.loc[linha,"Comp Data"]
             if(dataRef==dataDoc):            
-                permissão=1 #Permissão Para rodar Script do SAP
-                j=i
-            else:(
+                permissao=1 #Permissão Para rodar Script do SAP
+                fatura=new_tabela.loc[linha,"Seu Número"]
+ 
+                #tirar bloq pag
+                pg.press("f2")
+                pg.hotkey("shift", "f1")
+                pg.press("down", presses=2)
+                pg.write("backspace")
+                pg.hotkey("crtl", "s")  
+                pg.press("f3")
+                supdata=1
+ 
+ 
+            else:
                 #colocar bloq pag
                 print("Bloqueio de pagamento em: ",(i+1))
-            )
-        else:(
+                pg.press("f2")
+                pg.hotkey("shift", "f1")
+                pg.press("down", presses=2)
+                pg.write("a")
+                pg.hotkey("crtl", "s")  
+                pg.press("f3")
+     
+                supbloq=1    
+        else:
             print("Doc diferentes na tabela SAP em:",(i+1))
-            )
+            print(new_tabela.loc[linha])
+           
+           
         i=i+1
+ 
     pg.press("f3")
+ 
     #Rodar Script do SAP            
-    if(permissão==1):
-        print("Rodar script em linha: ",j)
-        permissão=0
+    if(permissao==1):
+ 
+        print("\nRodar script em\n",fatura)
+        permissao=0
+   
+    #Fatura não encontrada - tabela de retorno
+    if (supbloq & supdata & supdoc == 0):
+       
+        if (supbloq & supdata & supdoc == 0):
+            workbook = op.load_workbook("Projeto de automacao SAP.xlsx")
+            sheet = workbook["Retorno"]
+            data = (
+                (1, 2, 3),
+                (4, 5, 6)
+            )
+            for row in new_tabela.loc[linha]:
+                sheet.append(row)
+                workbook.save("Projeto de automacao SAP.xlsx")
+                print(new_tabela.loc[linha])
  
 pg.hotkey("alt", "tab")
