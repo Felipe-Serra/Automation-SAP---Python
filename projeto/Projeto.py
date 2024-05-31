@@ -1,6 +1,6 @@
 import pyautogui as pg
 import pandas as pd
-import openpyxl as op
+from openpyxl import load_workbook
 import time
 import pyperclip
  
@@ -25,6 +25,9 @@ def pegarNData():
     pg.hotkey("ctrl","y")
     pg.press("down", presses=(i+1)) #vai de 1 até o final da coluna1 (tamanho coluna SAP)
     pg.hotkey("ctrl", "c")
+ 
+ 
+ 
  
 permissao=0
 supdoc, supbloq, supdata = 0
@@ -124,18 +127,18 @@ for linha in tabela.index:
         permissao=0
    
     #Fatura não encontrada - tabela de retorno
+    i=0
+    index=tabela.index.any() +1
     if (supbloq & supdata & supdoc == 0):
-       
-        if (supbloq & supdata & supdoc == 0):
-            workbook = op.load_workbook("Projeto de automacao SAP.xlsx")
-            sheet = workbook["Retorno"]
-            data = (
-                (1, 2, 3),
-                (4, 5, 6)
-            )
-            for row in new_tabela.loc[linha]:
-                sheet.append(row)
-                workbook.save("Projeto de automacao SAP.xlsx")
-                print(new_tabela.loc[linha])
+        while i <= index:
+            book = load_workbook("Projeto de automacao SAP.xlsx")
+            sheet = book["Retorno"]
+            writer = pd.ExcelWriter('Projeto de automacao SAP.xlsx', engine='openpyxl', mode='a', if_sheet_exists='overlay')        
+           
+            linha2=tabela.iloc[[i]]
+            linha2.to_excel(writer, sheet_name="Retorno", startrow=1+i, header=None)
+            i+=1
+            writer.close()
+            print(linha2)
  
 pg.hotkey("alt", "tab")
