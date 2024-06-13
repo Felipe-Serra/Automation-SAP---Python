@@ -3,6 +3,8 @@ import pandas as pd
 import openpyxl
 import time
 import clipboard
+from SAP import getClient
+from SAP import main
  
 pg.PAUSE = 0.5
  
@@ -26,16 +28,24 @@ def pegarNData():
     pg.press("down", presses=(i+1)) #vai de 1 até o final da coluna1 (tamanho coluna SAP)
     pg.hotkey("ctrl", "c")
     pg.hotkey("ctrl", "c")
+# def pegarFatura():
+#     data = fatura.loc['Vencimento']
+#     codSap = fatura.loc['Cod SAP']
+#     documento = fatura.loc['Fatura']
+#     razao = fatura.loc['Conta Razão']
+#     valorC = fatura.loc['Valor cobrado']
+#     centroC = fatura.loc['Centro de custo']
  
  
 open("FaturaNA.txt", 'w').write(str('')) #Zerando o arquivo
 open("FaturaData.txt", 'w').write(str('')) #Zerando o arquivo
 open("FaturaBaixada.txt", 'w').write(str('')) #Zerando o arquivo
  
-tabela = pd.read_excel("Base de dados.xltm", sheet_name="DZ - Juros")
+tabela = pd.read_excel("Base de dados.xlsm", sheet_name="DZ - Juros")
 #tabela = tabela.drop(columns=["Nosso Número", "Data da Liquidação", "Pagador", "Responsável"])
 #print(tabela)
  
+getClient()
 pg.hotkey("alt", "tab")
 pg.write("FBL5N") # FBL5N - Partidas individuais de clientes / Rel CLIENTES
 pg.press("enter")
@@ -99,7 +109,7 @@ for linha in tabela.index:
  
             if(dataRef==dataDoc):            
                 permissao=1 #Permissão Para rodar Script do SAP
-                fatura=new_tabela.loc[linha,"Fatura"]
+                fatura=new_tabela.loc[linha]
  
                 #tirar bloq pag
                 pg.press("f2")
@@ -115,7 +125,6 @@ for linha in tabela.index:
                 pg.press("f3")
                 pg.press("f3")
                 supdata=1
-                print(supdata)
  
  
             else:
@@ -150,11 +159,10 @@ for linha in tabela.index:
     if(permissao==1):
  
         print("\nRodar script em\n",fatura)
+        main(fatura.loc['Vencimento'],fatura.loc['Cod SAP'],fatura.loc['Fatura'],fatura.loc['Conta Razão'],fatura.loc['Valor cobrado'],fatura.loc['Centro de custo'])
         permissao=0
  
     # LOG de dados -Tabela de retorno
-    print(supdata)
-    print(supbloq)
     # Fatura baixada
     if (supdata ==1):
        
