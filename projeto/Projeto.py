@@ -1,6 +1,6 @@
 import pyautogui as pg
 import pandas as pd
-from openpyxl import load_workbook
+import openpyxl
 import time
 import pyperclip
  
@@ -27,8 +27,8 @@ def pegarNData():
  
 permissao=0
  
-tabela = pd.read_excel("Projeto de automacao SAP.xlsx", sheet_name="DZ - Juros")
-tabela = tabela.drop(columns=["Nosso Número", "Data da Liquidação", "Pagador", "Responsável"])
+tabela = pd.read_excel("Base de dados.xltm", sheet_name="DZ - Juros")
+#tabela = tabela.drop(columns=["Nosso Número", "Data da Liquidação", "Pagador", "Responsável"])
 print(tabela)
  
 pg.hotkey("alt", "tab")
@@ -37,7 +37,7 @@ pg.press("enter")
 time.sleep(0.5)
  
 for linha in tabela.index:
-    supbloq= 0
+    supbloq= 1
     supdata= 0
  
     # Selecionar cliente na FBL5N
@@ -54,20 +54,20 @@ for linha in tabela.index:
     coluna = pyperclip.paste()
     coluna1 = coluna.count('\n') - 3
     print("\n^^^^^^^\n",coluna,"\n**",coluna1,"**""\n^^^^^^^^^\n")
-    time.sleep(1)
-    
+ 
     i=0
     while i < coluna1:
         #Pegar valor de N Doc
-        
+        time.sleep(0.3)
         pegarDoc()
         pegarNDoc()
  
         texto1 = float(pyperclip.paste())
         compDoc = pd.DataFrame({"Comp Doc":[texto1]})
         new_tabela = pd.concat([tabela, compDoc], axis=1)
- 
+       
         # Adicionando nova coluna para comparacao de Data
+        time.sleep(0.3)
         pegarNData()
        
         texto2 = pyperclip.paste()
@@ -125,45 +125,27 @@ for linha in tabela.index:
         permissao=0
  
     # LOG de dados -Tabela de retorno
-    book = load_workbook("Projeto de automacao SAP.xlsx")
-    sheet = book["Retorno"]
-    book.close()
-   
-    if book.close() == None:
-        # Fatura não encontrada
-        if (supbloq & supdata  == 0):
-            writer = pd.ExcelWriter('Projeto de automacao SAP.xlsx', engine='openpyxl', mode='a', if_sheet_exists='overlay')
+    # Fatura não encontrada
+    if (supbloq & supdata  == 0):
+        open("FaturaNA.txt", 'w').write(str('')) #Zerando o arquivo
+        lista1=tabela.iloc[[linha]]
+        for index, row in lista1.iterrows():
+            lista1.to_csv("FaturaNA.txt", sep=' ', index=False, header=False, mode='a')
  
-            linha2=tabela.loc[[linha]]
-           
-            linha2.to_excel(writer, sheet_name="Retorno", header=None, index=None, startrow=linha+2, startcol=1)
-            writer.close()
-            #print(book.close())
-            #print(linha2)
+    # Fatura com data divergente
+    if (supbloq==1 & supdata==0):
+        open("FaturaData.txt", 'w').write(str('')) #Zerando o arquivo
+        lista2=tabela.iloc[[linha]]
+        for index, row in lista2.iterrows():
+            lista2.to_csv("FaturaData.txt", sep=' ', index=False, header=False, mode='a')
  
-        # Fatura com data divergencia
-        if (supbloq==1 & supdata==0):
-            writer = pd.ExcelWriter('Projeto de automacao SAP.xlsx', engine='openpyxl', mode='a', if_sheet_exists='overlay')
+    # Fatura baixada
+    if ((supbloq==1 | supbloq==0) & supdata==1):
+        open("FaturaBaixada.txt", 'w').write(str('')) #Zerando o arquivo
+        lista3=tabela.iloc[[linha]]
+        for index, row in lista2.iterrows():
+            lista3.to_csv("FaturaBaixada.txt", sep=' ', index=False, header=False, mode='a')
  
-            linha2=tabela.loc[[linha]]
-           
-            linha2.to_excel(writer, sheet_name="Retorno", header=None, index=None, startrow=linha+2, startcol=11)
-            writer.close()
-            #print(book.close())
-            #print(linha2)
  
-        # Fatura baixada
-        if ((supbloq==1 | supbloq==0) & supdata==1):
-            writer = pd.ExcelWriter('Projeto de automacao SAP.xlsx', engine='openpyxl', mode='a', if_sheet_exists='overlay')
- 
-            linha2=tabela.loc[[linha]]
-           
-            linha2.to_excel(writer, sheet_name="Retorno", header=None, index=None, startrow=linha+2, startcol=22)
-            writer.close()
-            #print(book.close())
-            #print(linha2)
-    else:
-        print("Excel aberto: feche Aplicativo")
-    book.close()
  
 pg.hotkey("alt", "tab")
